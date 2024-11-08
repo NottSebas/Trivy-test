@@ -22,7 +22,8 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.cache:/root/.cache aquasec/trivy:0.57.0 image python:3.9-alpine --exit-code 0 --format json --ignore-unfixed --severity CRITICAL,HIGH --scanners vuln > trivy_report.json
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.cache:/root/.cache aquasec/trivy:0.57.0 image python:3.9-alpine --format json --ignore-unfixed --severity CRITICAL,HIGH --scanners vuln > trivy_report.json
+        continue-on-error: true
 
       - name: Upload scan results
         uses: actions/upload-artifact@v3
@@ -39,6 +40,7 @@ jobs:
           label: kind/security
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
 
