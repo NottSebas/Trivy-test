@@ -1,16 +1,26 @@
 name: Scan vulnerabilities
+
 on:
   schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+    - cron: '0 0 * * *'  # Ejecutar diariamente a la medianoche (UTC)
+  workflow_dispatch:  # Permite ejecutar el workflow manualmente
 
 jobs:
   build:
     name: Scan Go vulnerabilities
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.6
+
+      - name: Set up cache for Trivy DB
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/trivy
+          key: ${{ runner.os }}-trivy-db
+          restore-keys: |
+            ${{ runner.os }}-trivy-db
 
       - name: Run Trivy vulnerability scanner and create GitHub issues
         uses: knqyf263/trivy-issue-action@v0.0.6
@@ -21,6 +31,8 @@ jobs:
           label: kind/security
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRIVY_CACHE_DIR: ~/.cache/trivy
+
 
 
 
