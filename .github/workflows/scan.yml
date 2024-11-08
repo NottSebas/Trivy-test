@@ -1,5 +1,5 @@
-name: Scan vulnerabilities
 
+#name: Scan vulnerabilities
 on:
   schedule:
     - cron: '0 0 * * *'  # Ejecutar diariamente a la medianoche (UTC)
