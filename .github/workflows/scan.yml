@@ -1,5 +1,4 @@
 name: Scan vulnerabilities
-
 on:
   schedule:
     - cron: '0 0 * * *'
@@ -9,29 +8,11 @@ jobs:
   build:
     name: Scan Go vulnerabilities
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.6
 
-      - name: Pull Python image
-        run: docker pull python:3.9-alpine
-
-      - name: Pull Trivy image
-        run: docker pull aquasec/trivy:0.57.0
-
-      - name: Run Trivy vulnerability scanner
-        run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.cache:/root/.cache aquasec/trivy:0.57.0 image python:3.9-alpine --format json --ignore-unfixed --severity CRITICAL,HIGH --scanners vuln > trivy_report.json
-        continue-on-error: true
-
-      - name: Upload scan results
-        uses: actions/upload-artifact@v3
-        with:
-          name: trivy-scan-results
-          path: trivy_report.json
-
-      - name: Create GitHub issues
+      - name: Run Trivy vulnerability scanner and create GitHub issues
         uses: knqyf263/trivy-issue-action@v0.0.6
         with:
           assignee: knqyf263
