@@ -20,7 +20,17 @@ jobs:
       - name: Pull Trivy image
         run: docker pull aquasec/trivy:0.57.0
 
-      - name: Run Trivy vulnerability scanner and create GitHub issues
+      - name: Run Trivy vulnerability scanner
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.cache:/root/.cache aquasec/trivy:0.57.0 image python:3.4-alpine --exit-code 1 --format json --ignore-unfixed --severity CRITICAL,HIGH > trivy_report.json
+
+      - name: Upload scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-scan-results
+          path: trivy_report.json
+
+      - name: Create GitHub issues
         uses: knqyf263/trivy-issue-action@v0.0.6
         with:
           assignee: knqyf263
@@ -29,5 +39,3 @@ jobs:
           label: kind/security
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TRIVY_IMAGE: aquasec/trivy:0.57.0
-          TRIVY_IMAGE_SCAN: python:3.4-alpine
