@@ -27,5 +27,18 @@ jobs:
       - name: Upload scan results
         uses: actions/upload-artifact@v3
         with:
+          name: trivy-scan-results
+          path: trivy_report.json
+
+      - name: Create GitHub issues
+        uses: knqyf263/trivy-issue-action@v0.0.6
+        with:
+          assignee: knqyf263
+          severity: CRITICAL
+          skip-dirs: integration,examples,pkg
+          label: kind/security
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
