@@ -1,4 +1,4 @@
-name: Trivy Scan
+name: Trivy Local Image Scan
 
 on:
   push:
@@ -16,16 +16,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Pull Docker image
-        run: |
-          docker pull python:3.4-alpine
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-      - name: Set up Trivy
-        uses: aquasecurity/trivy-action@master
+      - name: Build Docker image
+        run: |
+          docker build -t my-local-image:latest .
 
       - name: Run Trivy Scan
         run: |
-          trivy image --severity HIGH,CRITICAL --ignore-unfixed python:3.4-alpine
+          trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 my-local-image:latest
 
 
 
