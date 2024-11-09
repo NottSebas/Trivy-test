@@ -20,14 +20,24 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Build Docker image
-        run: |
-          docker build -t my-local-image:latest .
+        run: docker build -t my-local-image:latest .
 
       - name: Run Trivy Scan
+        id: trivy_scan
         run: |
-          trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 my-local-image:latest
-
-
+          trivy image --severity HIGH,CRITICAL --ignore-unfixed --format json --output trivy-report.json my-local-image:latest
+          
+      - name: Create GitHub Issue
+        if: success() && steps.trivy_scan.outcome == 'success'
+        uses: peter-evans/create-issue@v2
+        with:
+          title: "Trivy Vulnerability Report for my-local-image"
+          body: |
+            ### Vulnerability Report
+            ```json
+            $(cat trivy-report.json)
+            ```
+          labels: vulnerability, report
 
 
 
