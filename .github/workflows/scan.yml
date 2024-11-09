@@ -16,13 +16,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Pull Docker image
+        run: |
+          docker pull python:3.4-alpine
+
       - name: Set up Trivy
         uses: aquasecurity/trivy-action@master
 
       - name: Run Trivy Scan
         run: |
           trivy image --severity HIGH,CRITICAL --ignore-unfixed python:3.4-alpine
-
 
 
 
