@@ -1,23 +1,24 @@
-name: Scan vulnerabilities
+name: Trivy Scan
+
 on:
-  schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build:
-    name: Scan Go vulnerabilities
+  trivy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4.1.6
+        uses: actions/checkout@v2
 
-      - name: Run Trivy vulnerability scanner and create GitHub issues
-        uses: knqyf263/trivy-issue-action@v0.0.6
-        with:
-          assignee: knqyf263
-          severity: CRITICAL
-          skip-dirs: integration,examples,pkg
-          label: kind/security
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Trivy
+        uses: aquasecurity/trivy-action@master
+
+      - name: Run Trivy Scan
+        run: |
+          trivy image --severity HIGH,CRITICAL --ignore-unfixed python:3.4-alpine
